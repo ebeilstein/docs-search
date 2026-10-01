@@ -1,0 +1,185 @@
+{
+  "guides": [
+    {
+      "id": "direct-deposit",
+      "title": "Set up direct deposit",
+      "category": "Payroll",
+      "keywords": [
+        "bank account",
+        "paycheck",
+        "routing number",
+        "account number",
+        "deposit",
+        "get paid",
+        "change bank"
+      ],
+      "intro": "Have your pay deposited straight into your bank account. *(Sample content: replace with your real procedure.)*",
+      "before": [
+        "Have your bank's **routing number** (9 digits) and your **account number** ready.",
+        "You can find both at the bottom of a check or in your bank's app."
+      ],
+      "steps": [
+        {
+          "text": "Sign in to the **employee self-service portal**.",
+          "details": ""
+        },
+        {
+          "text": "Go to **Pay** → **Direct Deposit**.",
+          "details": ""
+        },
+        {
+          "text": "Click **Add account**.",
+          "details": ""
+        },
+        {
+          "text": "Enter your **routing number** and **account number**, then choose **Checking** or **Savings**.",
+          "details": ""
+        },
+        {
+          "text": "Choose how much to deposit: **the full amount** or a **set dollar amount / percentage**.",
+          "details": ""
+        },
+        {
+          "text": "Review the details and click **Submit**.",
+          "details": "Changes usually take effect in 1–2 pay periods. You'll get a paper check until then."
+        }
+      ],
+      "troubleshooting": [
+        "**Routing number rejected:** double-check it with your bank; some banks use a different number for direct deposit.",
+        "**Deposit didn't arrive:** contact Payroll with your pay date and the last 4 digits of the account."
+      ]
+    },
+    {
+      "id": "reset-password",
+      "title": "Reset your password",
+      "category": "Accounts",
+      "keywords": [
+        "forgot password",
+        "locked out",
+        "can't log in",
+        "change password",
+        "sign in",
+        "login problem"
+      ],
+      "intro": "Use this guide if you forgot your password or your account is locked. *(Sample content: replace with your real procedure.)*",
+      "before": [
+        "You need access to the email address or phone number on file.",
+        "If your account is locked after too many attempts, wait 15 minutes before trying again."
+      ],
+      "steps": [
+        {
+          "text": "Open the **employee sign-in page** in your web browser.",
+          "details": ""
+        },
+        {
+          "text": "Under the password box, click **Forgot password?**",
+          "details": ""
+        },
+        {
+          "text": "Enter your **employee ID or work email**, then click **Send reset link**.",
+          "details": "If you don't see the email within 5 minutes, check your junk/spam folder."
+        },
+        {
+          "text": "Open the email and click **Reset my password**. The link expires after 30 minutes.",
+          "details": ""
+        },
+        {
+          "text": "Choose a new password. It must be at least 12 characters and different from your last 5 passwords.",
+          "details": ""
+        },
+        {
+          "text": "Click **Save**, then sign in with your new password.",
+          "details": ""
+        }
+      ],
+      "troubleshooting": [
+        "**No email arrived:** confirm the email on file with IT, then try again.",
+        "**Link expired:** go back to step 2 and request a new link.",
+        "**Still locked out:** contact the IT Help Desk."
+      ]
+    },
+    {
+      "id": "update-tax-withholding",
+      "title": "Update your tax withholding (W-4)",
+      "category": "Payroll",
+      "keywords": [
+        "w4",
+        "w-4",
+        "taxes",
+        "federal withholding",
+        "state withholding",
+        "de4",
+        "de-4",
+        "allowances",
+        "tax form"
+      ],
+      "intro": "Change how much federal or state tax is taken out of each paycheck. *(Sample content: replace with your real procedure.)*",
+      "before": [
+        "The IRS **Tax Withholding Estimator** can help you decide what to enter."
+      ],
+      "steps": [
+        {
+          "text": "Sign in to the **employee self-service portal**.",
+          "details": ""
+        },
+        {
+          "text": "Go to **Pay** → **Tax Withholding**.",
+          "details": ""
+        },
+        {
+          "text": "Choose **Federal (W-4)** or **State (DE 4)**.",
+          "details": ""
+        },
+        {
+          "text": "Fill out the form. Each section has help text if you're unsure.",
+          "details": ""
+        },
+        {
+          "text": "Sign electronically and click **Submit**.",
+          "details": "The change applies to the next payroll that hasn't been processed yet."
+        }
+      ],
+      "troubleshooting": [
+        "**Not sure what to enter:** talk to a tax professional. Payroll staff can't give tax advice."
+      ]
+    },
+    {
+      "id": "view-pay-stub",
+      "title": "View or download your pay stub",
+      "category": "Payroll",
+      "keywords": [
+        "paystub",
+        "pay statement",
+        "earnings",
+        "paycheck details",
+        "deductions",
+        "print pay stub",
+        "download"
+      ],
+      "intro": "Find, view, and save your pay statements. *(Sample content: replace with your real procedure.)*",
+      "before": [],
+      "steps": [
+        {
+          "text": "Sign in to the **employee self-service portal**.",
+          "details": ""
+        },
+        {
+          "text": "Go to **Pay** → **Pay Statements**.",
+          "details": ""
+        },
+        {
+          "text": "Pick the **pay date** you want from the list.",
+          "details": ""
+        },
+        {
+          "text": "Click **View** to see it, or **Download PDF** to save or print it.",
+          "details": ""
+        }
+      ],
+      "troubleshooting": [
+        "**Pay date not listed:** statements appear on the morning of payday.",
+        "**A number looks wrong:** contact Payroll before the next pay period."
+      ]
+    }
+  ]
+}

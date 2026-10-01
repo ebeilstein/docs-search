@@ -1,0 +1,292 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Employee Help Guides</title>
+<style>
+  :root{
+    --bg:#F6F4EE; --card:#FFFFFF; --ink:#1E2530; --muted:#5B6472;
+    --border:#E2DED2; --accent:#1B5E9E; --accent-ink:#FFFFFF; --accent-soft:#E6EEF6;
+    --ok:#2E5D52; --ok-bg:#E7EFEC; --warn-bg:#FBF0DE; --radius:12px;
+    --sans:-apple-system, BlinkMacSystemFont, 'Segoe UI', system-ui, sans-serif;
+  }
+  @media (prefers-color-scheme: dark){
+    :root:not([data-theme="light"]){
+      --bg:#14181F; --card:#1B212B; --ink:#EAEAE6; --muted:#9BA3AE;
+      --border:#2B323D; --accent:#5A9BD8; --accent-ink:#0E1620; --accent-soft:#1D2D3E;
+      --ok:#8CC7B5; --ok-bg:#173029; --warn-bg:#2E2413;
+    }
+  }
+  :root[data-theme="dark"]{
+    --bg:#14181F; --card:#1B212B; --ink:#EAEAE6; --muted:#9BA3AE;
+    --border:#2B323D; --accent:#5A9BD8; --accent-ink:#0E1620; --accent-soft:#1D2D3E;
+    --ok:#8CC7B5; --ok-bg:#173029; --warn-bg:#2E2413;
+  }
+  *{box-sizing:border-box;}
+  body{margin:0; background:var(--bg); color:var(--ink); font-family:var(--sans); font-size:16px; line-height:1.55;}
+  main{max-width:720px; margin:0 auto; padding:32px 16px 64px;}
+  h1{font-size:28px; margin:0 0 6px;}
+  h2{font-size:22px; margin:0 0 8px;}
+  h3{font-size:15px; margin:0 0 6px; text-transform:uppercase; letter-spacing:.04em; color:var(--muted);}
+  p{margin:0 0 12px;}
+  .sub{color:var(--muted); margin-bottom:20px;}
+  a{color:var(--accent);}
+  button{font:inherit; cursor:pointer;}
+  :focus-visible{outline:3px solid var(--accent); outline-offset:2px;}
+
+  .search{display:flex; gap:8px;}
+  .search input{flex:1; min-width:0; font:inherit; padding:14px 16px; border:2px solid var(--border);
+    border-radius:var(--radius); background:var(--card); color:var(--ink);}
+  .search input:focus{border-color:var(--accent); outline:none;}
+  .btn{border:none; border-radius:10px; padding:12px 18px; background:var(--accent); color:var(--accent-ink); font-weight:600;}
+  .btn.secondary{background:transparent; color:var(--ink); border:1px solid var(--border);}
+  .btn:disabled{opacity:.4; cursor:default;}
+  .chips{display:flex; flex-wrap:wrap; gap:8px; margin:14px 0 28px;}
+  .chip{border:1px solid var(--border); background:var(--card); color:var(--ink); border-radius:999px; padding:6px 12px; font-size:14px;}
+
+  .card{background:var(--card); border:1px solid var(--border); border-radius:var(--radius); padding:20px; margin-bottom:12px;}
+  .result{display:block; width:100%; text-align:left; color:inherit;}
+  .result:hover{border-color:var(--accent);}
+  .result.best{border:2px solid var(--accent);}
+  .tag{display:inline-block; font-size:12px; font-weight:600; color:var(--muted); margin-bottom:4px;}
+  .best .tag{color:var(--accent);}
+  .result .title{font-size:18px; font-weight:600; margin-bottom:2px;}
+  .result .desc{color:var(--muted); font-size:15px; margin:0;}
+  .empty{background:var(--warn-bg);}
+
+  .back{background:none; border:none; color:var(--accent); padding:0; margin-bottom:16px;}
+  .before{background:var(--accent-soft); border:none;}
+  .before ul, .trouble ul{margin:0; padding-left:20px;}
+  .progress{display:flex; gap:4px; margin:20px 0 10px;}
+  .progress span{flex:1; height:6px; border-radius:3px; background:var(--border);}
+  .progress span.on{background:var(--accent);}
+  .stepno{color:var(--muted); font-size:14px; font-weight:600; margin-bottom:4px;}
+  .step{min-height:150px;}
+  .step .text{font-size:20px; margin-bottom:10px;}
+  .step .details{color:var(--muted); margin:0;}
+  .nav{display:flex; justify-content:space-between; gap:8px; margin-top:12px;}
+  .toggle{background:none; border:none; color:var(--accent); padding:0; margin-top:18px; font-size:14px;}
+  ol.all{padding-left:22px; margin:0;}
+  ol.all li{margin-bottom:12px;}
+  ol.all .details{color:var(--muted); font-size:15px;}
+  .done{background:var(--ok-bg); border:none;}
+  .done .actions{display:flex; gap:8px; flex-wrap:wrap; margin-top:8px;}
+  .hidden{display:none;}
+</style>
+</head>
+<body>
+<main>
+  <div id="home">
+    <h1>How can we help?</h1>
+    <p class="sub">Ask a question in your own words, like “how do I reset my password”.</p>
+    <form class="search" id="searchForm" role="search">
+      <label for="q" class="hidden">Search the help guides</label>
+      <input id="q" type="search" autocomplete="off" placeholder="Type your question…">
+      <button class="btn" type="submit">Search</button>
+    </form>
+    <div class="chips" id="chips" aria-label="Popular guides"></div>
+    <div id="results" aria-live="polite"></div>
+  </div>
+  <div id="guide" class="hidden"></div>
+</main>
+
+<script>
+// Who to contact when no guide helps. Edit this for your team.
+const HELP_CONTACT = 'Still need help? Contact the IT Help Desk (accounts and passwords) or Payroll (pay and taxes).';
+
+const STOPWORDS = new Set(('a an and are as at be can could do does doing for from get getting got have help how i i\'m im ' +
+  'in into is it its me my need of on or please should so the there this to too up want was what when where which ' +
+  'who why will with would you your').split(' '));
+
+let guides = [];
+
+function esc(s){
+  return s.replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+}
+// Minimal inline Markdown: **bold**, *italic*, `code`, [text](https://link).
+function md(s){
+  return esc(s)
+    .replace(/\*\*(.+?)\*\*/g, '<strong>$1</strong>')
+    .replace(/\*(.+?)\*/g, '<em>$1</em>')
+    .replace(/`(.+?)`/g, '<code>$1</code>')
+    .replace(/\[(.+?)\]\((https?:\/\/[^\s)]+)\)/g, '<a href="$2" target="_blank" rel="noopener">$1</a>');
+}
+function plain(s){ return s.replace(/[*`]/g, ''); }
+
+function stem(w){
+  if (w.length > 5 && w.endsWith('ing')) return w.slice(0, -3);
+  if (w.length > 4 && w.endsWith('ed')) return w.slice(0, -2);
+  if (w.length > 3 && w.endsWith('s') && !w.endsWith('ss')) return w.slice(0, -1);
+  return w;
+}
+function tokens(s){
+  return s.toLowerCase().replace(/['’]/g, '').replace(/([a-z0-9])-([a-z0-9])/g, '$1$2')
+    .split(/[^a-z0-9]+/).filter(Boolean).map(stem);
+}
+
+function buildIndex(){
+  for (const g of guides){
+    const field = (text, weight) => ({ toks: new Set(tokens(text)), weight });
+    g._fields = [
+      field(g.title, 4),
+      field(g.keywords.join(' '), 3),
+      field(g.category + ' ' + g.intro, 1),
+      field(g.steps.map(s => s.text + ' ' + s.details).join(' '), 1),
+      field(g.troubleshooting.join(' '), 0.5),
+    ];
+  }
+}
+
+// Scores each guide by how well the question's meaningful words match its fields.
+function search(query){
+  const q = tokens(query).filter(t => !STOPWORDS.has(t));
+  if (!q.length) return [];
+  const scored = guides.map(g => {
+    let score = 0, matched = 0, strong = false;
+    for (const t of q){
+      let best = 0;
+      for (const f of g._fields){
+        let w = 0;
+        if (f.toks.has(t)) w = f.weight;
+        else if (t.length >= 3) for (const ft of f.toks){ if (ft.startsWith(t) || (ft.length >= 4 && t.startsWith(ft))) { w = f.weight * 0.6; break; } }
+        best = Math.max(best, w);
+      }
+      if (best) matched++;
+      if (best >= 3) strong = true;
+      score += best;
+    }
+    score = score / q.length + (matched === q.length ? 1 : 0);
+    return { g, score, strong };
+  });
+  return scored.filter(r => r.score >= 1 && (r.strong || r.score >= 2))
+    .sort((a, b) => b.score - a.score);
+}
+
+function renderResults(query){
+  const box = document.getElementById('results');
+  if (!query.trim()){ box.innerHTML = ''; return; }
+  const hits = search(query);
+  if (!hits.length){
+    box.innerHTML = `<div class="card empty"><strong>No guide matches “${esc(query)}” yet.</strong>
+      <p style="margin:6px 0 0">Try different words, or pick a popular guide above. ${esc(HELP_CONTACT)}</p></div>`;
+    return;
+  }
+  box.innerHTML = hits.slice(0, 5).map((r, i) => `
+    <button class="card result${i === 0 ? ' best' : ''}" data-id="${esc(r.g.id)}">
+      <span class="tag">${i === 0 ? 'Best match · ' : ''}${esc(r.g.category)} · ${r.g.steps.length} steps</span>
+      <div class="title">${esc(r.g.title)}</div>
+      <p class="desc">${esc(plain(r.g.intro))}</p>
+    </button>`).join('');
+}
+
+function renderChips(){
+  document.getElementById('chips').innerHTML = guides.map(g =>
+    `<button class="chip" data-id="${esc(g.id)}">${esc(g.title)}</button>`).join('');
+}
+
+// ---------- walkthrough ----------
+function showGuide(id, step, all){
+  const g = guides.find(x => x.id === id);
+  if (!g){ showHome(); return; }
+  const n = g.steps.length;
+  step = Math.min(Math.max(step || 1, 1), n + 1); // n + 1 is the "done" screen
+  document.getElementById('home').classList.add('hidden');
+  const el = document.getElementById('guide');
+  el.classList.remove('hidden');
+
+  const before = g.before.length ? `<div class="card before"><h3>Before you start</h3>
+    <ul>${g.before.map(b => `<li>${md(b)}</li>`).join('')}</ul></div>` : '';
+  const trouble = g.troubleshooting.length ? `<div class="card trouble"><h3>If something goes wrong</h3>
+    <ul>${g.troubleshooting.map(b => `<li>${md(b)}</li>`).join('')}</ul></div>` : '';
+
+  let body;
+  if (all){
+    body = `<div class="card"><ol class="all">${g.steps.map(s =>
+      `<li>${md(s.text)}${s.details ? `<div class="details">${md(s.details)}</div>` : ''}</li>`).join('')}</ol></div>
+      ${trouble}
+      <button class="toggle" data-action="stepmode">Walk me through it one step at a time</button>`;
+  } else if (step > n){
+    body = `<div class="progress">${'<span class="on"></span>'.repeat(n)}</div>
+      <div class="card done" id="doneCard"><h2>You're done!</h2><p>Did this solve your problem?</p>
+        <div class="actions"><button class="btn" data-action="yes">Yes, thanks</button>
+        <button class="btn secondary" data-action="no">No, I'm still stuck</button></div></div>
+      <div id="stuck" class="hidden">${trouble}<div class="card empty">${esc(HELP_CONTACT)}</div></div>
+      <div class="nav"><button class="btn secondary" data-step="${n}">Back</button></div>`;
+  } else {
+    const s = g.steps[step - 1];
+    body = `<div class="progress" aria-hidden="true">${g.steps.map((_, i) => `<span class="${i < step ? 'on' : ''}"></span>`).join('')}</div>
+      <div class="card step" aria-live="polite">
+        <div class="stepno">Step ${step} of ${n}</div>
+        <div class="text">${md(s.text)}</div>
+        ${s.details ? `<p class="details">${md(s.details)}</p>` : ''}
+      </div>
+      <div class="nav">
+        <button class="btn secondary" data-step="${step - 1}" ${step === 1 ? 'disabled' : ''}>Back</button>
+        <button class="btn" data-step="${step + 1}">${step === n ? 'Finish' : 'Next'}</button>
+      </div>
+      <button class="toggle" data-action="all">Show all steps on one page</button>`;
+  }
+
+  el.innerHTML = `<button class="back" data-action="home">← All guides</button>
+    <h1>${esc(g.title)}</h1><p class="sub">${md(g.intro)}</p>
+    ${step === 1 || all ? before : ''}${body}`;
+  el.dataset.id = id;
+}
+
+function showHome(){
+  document.getElementById('guide').classList.add('hidden');
+  document.getElementById('home').classList.remove('hidden');
+}
+
+// URL format: #/guide-id/step-number or #/guide-id/all, so any step can be linked or bookmarked.
+function route(){
+  const m = location.hash.match(/^#\/([\w-]+)(?:\/(\d+|all))?/);
+  if (!m) { showHome(); return; }
+  showGuide(m[1], m[2] === 'all' ? 1 : parseInt(m[2] || '1', 10), m[2] === 'all');
+  window.scrollTo(0, 0);
+}
+function go(id, step){ location.hash = `#/${id}/${step}`; }
+
+document.addEventListener('click', e => {
+  const t = e.target.closest('button');
+  if (!t) return;
+  const guideEl = document.getElementById('guide');
+  if (t.dataset.id) go(t.dataset.id, 1);
+  else if (t.dataset.step) go(guideEl.dataset.id, t.dataset.step);
+  else if (t.dataset.action === 'home') location.hash = '';
+  else if (t.dataset.action === 'all') go(guideEl.dataset.id, 'all');
+  else if (t.dataset.action === 'stepmode') go(guideEl.dataset.id, 1);
+  else if (t.dataset.action === 'yes') document.getElementById('doneCard').innerHTML = '<h2>Great, glad that helped!</h2><p><a href="#">Back to all guides</a></p>';
+  else if (t.dataset.action === 'no') document.getElementById('stuck').classList.remove('hidden');
+});
+
+document.addEventListener('keydown', e => {
+  if (document.getElementById('guide').classList.contains('hidden') || e.target.matches('input')) return;
+  const next = document.querySelector('.nav [data-step]:last-child:not([disabled])');
+  const back = document.querySelector('.nav [data-step]:first-child:not([disabled])');
+  if (e.key === 'ArrowRight' && next) next.click();
+  if (e.key === 'ArrowLeft' && back) back.click();
+});
+
+const input = document.getElementById('q');
+input.addEventListener('input', () => renderResults(input.value));
+document.getElementById('searchForm').addEventListener('submit', e => {
+  e.preventDefault();
+  const hits = search(input.value);
+  renderResults(input.value);
+  // A clear winner on Enter goes straight to the walkthrough.
+  if (hits.length && (hits.length === 1 || hits[0].score > hits[1].score + 1)) go(hits[0].g.id, 1);
+});
+window.addEventListener('hashchange', route);
+
+fetch('search-index.json')
+  .then(r => { if (!r.ok) throw new Error(r.status); return r.json(); })
+  .then(data => { guides = data.guides; buildIndex(); renderChips(); route(); })
+  .catch(() => {
+    document.getElementById('results').innerHTML = '<div class="card empty">Couldn\'t load the guides. ' +
+      'Open this page through a web server (not by double-clicking the file) and make sure search-index.json exists.</div>';
+  });
+</script>
+</body>
+</html>
